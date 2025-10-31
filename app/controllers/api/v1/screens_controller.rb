@@ -1,6 +1,6 @@
 class Api::V1::ScreensController < ApplicationController
     # before_action :authorize_request, except: [:index, :show]
-    skip_before_action :authorize_request, only: [:index, :show, :create, :update, :destroy]
+    skip_before_action :authorize_request, only: [:index, :show, :create, :update, :destroy, :upload_background]
 
     def index
     render json: Screen.all
@@ -34,6 +34,18 @@ class Api::V1::ScreensController < ApplicationController
         s.destroy
         head :no_content
     end
+
+    def upload_background
+      screen = Screen.find(params[:id])
+      if params[:background].present?
+        screen.background.attach(params[:background])
+        render json: { message: "Background uploaded successfully", url: url_for(screen.background) }
+      else
+        render json: { error: "No file attached" }, status: :unprocessable_entity
+      end
+    end
+
+
 
     private
     def screen_params

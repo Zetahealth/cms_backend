@@ -33,7 +33,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata)
+    params.permit(:title, :content_type, :metadata ,:content ,:position)
     end
 
     def content_serializer(c)

@@ -5,7 +5,11 @@ class Screen < ApplicationRecord
 
     validates :name, presence: true
     validates :slug, uniqueness: true
+    has_one_attached :background
 
+    has_many :screen_container_assignments
+    has_many :screen_containers, through: :screen_container_assignments
+    
     private
 
     def generate_slug

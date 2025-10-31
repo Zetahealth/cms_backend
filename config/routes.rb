@@ -37,7 +37,21 @@ Rails.application.routes.draw do
         registrations: 'api/v1/users/registrations',
         sessions: 'api/v1/users/sessions'
       }
-      resources :screens, only: [:index, :show, :create, :update, :destroy]
+      # resources :screens, only: [:index, :show, :create, :update, :destroy]
+
+      resources :screens do
+        member do
+          post :upload_background
+        end
+      end
+
+      resources :screen_containers do
+        member do
+          post :assign_screen
+          delete :unassign_screen
+        end
+      end
+
       resources :contents, only: [:index, :show, :create, :destroy]
       resources :assignments, only: [:index, :show, :create, :update, :destroy]
       # post "assignments", to: "assignments#create"
