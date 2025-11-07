@@ -14,16 +14,31 @@ class Api::V1::ContentsController < ApplicationController
     end
 
     def create
-    c = Content.new(content_params)
-    if c.save
-        if params[:files].present?
-        params[:files].each { |f| c.files.attach(f) }
+        c = Content.new(content_params)
+
+        if c.save
+            # Attach uploaded files if present
+            if params[:files].present?
+            params[:files].each { |f| c.files.attach(f) }
+            end
+
+            # ✅ Generate QR code automatically if hyperlink exists
+            if c.hyperlink.present?
+            qrcode = RQRCode::QRCode.new(c.hyperlink)
+            png = qrcode.as_png(size: 200)
+            c.qr_code.attach(
+                io: StringIO.new(png.to_s),
+                filename: "qr_code.png",
+                content_type: "image/png"
+            )
+            end
+
+            render json: content_serializer(c), status: :created
+        else
+            render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
         end
-        render json: content_serializer(c), status: :created
-    else
-        render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
     end
-    end
+
 
     def destroy
     c = Content.find(params[:id])
@@ -33,7 +48,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata ,:content ,:position)
+    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink)
     end
 
     def content_serializer(c)
