@@ -57,7 +57,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # config.action_mailer.default_url_options = { host: "example.com" }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -86,4 +86,14 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+    routes.default_url_options = { host: "https://backendafp.connectorcore.com" }
+
+  # You can also add this for URL helpers and mailers
+  # config.action_mailer.default_url_options = { host: "https://backendafp.connectorcore.com" }
+
+  # Make sure Active Storage uses correct URL host for files
+  config.active_storage.resolve_model_to_route = :rails_storage_proxy
+  config.active_storage.default_url_options = {
+    host: "https://backendafp.connectorcore.com"
+  }
 end

@@ -1,6 +1,6 @@
 class Api::V1::ContentsController < ApplicationController
     # before_action :authorize_request, except: [:index, :show]
-    skip_before_action :authorize_request, only: [:index, :show, :create]
+    skip_before_action :authorize_request, only: [:index, :show, :create , :destroy]
 
 
     include Rails.application.routes.url_helpers
