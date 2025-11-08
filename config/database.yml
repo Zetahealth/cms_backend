@@ -47,7 +47,7 @@ default: &default
   host: 127.0.0.1
   socket: /tmp/mysqld.sock
   username: root
-  password: root
+  password: Root@123
 
 development:
   <<: *default
@@ -57,7 +57,7 @@ test:
   <<: *default
   database: Cms_test
   username: root
-  password: root
+  password: Root@123
 
 production:
   <<: *default

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_09_120544) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_07_074557) do
   create_table "active_storage_attachments", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -57,6 +57,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_120544) do
     t.text "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "content"
+    t.string "position"
+    t.string "hyperlink"
+  end
+
+  create_table "screen_container_assignments", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "screen_container_id", null: false
+    t.bigint "screen_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["screen_container_id"], name: "index_screen_container_assignments_on_screen_container_id"
+    t.index ["screen_id"], name: "index_screen_container_assignments_on_screen_id"
+  end
+
+  create_table "screen_containers", charset: "utf8mb3", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "screens", charset: "utf8mb3", force: :cascade do |t|
@@ -85,4 +103,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_120544) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "assignments", "contents"
   add_foreign_key "assignments", "screens"
+  add_foreign_key "screen_container_assignments", "screen_containers"
+  add_foreign_key "screen_container_assignments", "screens"
 end
