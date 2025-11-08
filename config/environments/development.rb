@@ -85,7 +85,7 @@ Rails.application.configure do
   # You can also add this for URL helpers and mailers
   # config.action_mailer.default_url_options = { host: "https://backendafp.connectorcore.com" }
     config.hosts << "backendafp.connectorcore.com"
-       config.hosts << "puma_4000"
+  #       config.hosts << "puma_4000"
   # Make sure Active Storage uses correct URL host for files
   config.active_storage.resolve_model_to_route = :rails_storage_proxy
   config.active_storage.default_url_options = {
