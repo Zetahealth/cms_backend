@@ -91,4 +91,7 @@ Rails.application.configure do
   config.active_storage.default_url_options = {
     host: "https://backendafp.connectorcore.com"
   }
+
+ config.hosts.clear
+
 end
