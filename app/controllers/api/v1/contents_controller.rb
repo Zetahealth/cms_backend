@@ -13,16 +13,47 @@ class Api::V1::ContentsController < ApplicationController
     render json: content_serializer(c)
     end
 
+    # def create
+    #     c = Content.new(content_params)
+
+    #     if c.save
+    #         # Attach uploaded files if present
+    #         if params[:files].present?
+    #         params[:files].each { |f| c.files.attach(f) }
+    #         end
+
+    #         # ✅ Generate QR code automatically if hyperlink exists
+    #         if c.hyperlink.present?
+    #         qrcode = RQRCode::QRCode.new(c.hyperlink)
+    #         png = qrcode.as_png(size: 200)
+    #         c.qr_code.attach(
+    #             io: StringIO.new(png.to_s),
+    #             filename: "qr_code.png",
+    #             content_type: "image/png"
+    #         )
+    #         end
+
+    #         render json: content_serializer(c), status: :created
+    #     else
+    #         render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
+    #     end
+    # end
+
+
+
     def create
         c = Content.new(content_params)
-
         if c.save
-            # Attach uploaded files if present
+            # ✅ Handle single or multiple file uploads
             if params[:files].present?
-            params[:files].each { |f| c.files.attach(f) }
+            if params[:files].is_a?(Array)
+                params[:files].each { |f| c.files.attach(f) }
+            else
+                c.files.attach(params[:files])
+            end
             end
 
-            # ✅ Generate QR code automatically if hyperlink exists
+            # ✅ Generate QR code if hyperlink present
             if c.hyperlink.present?
             qrcode = RQRCode::QRCode.new(c.hyperlink)
             png = qrcode.as_png(size: 200)
@@ -40,6 +71,10 @@ class Api::V1::ContentsController < ApplicationController
     end
 
 
+
+
+
+
     def destroy
     c = Content.find(params[:id])
     c.destroy
@@ -48,7 +83,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink)
+    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect, files: [])
     end
 
     def content_serializer(c)
