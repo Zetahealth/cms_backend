@@ -14,12 +14,27 @@
 #       methods: [:get, :post, :put, :patch, :delete, :options, :head]
 #   end
 # end
+
+# Rails.application.config.middleware.insert_before 0, Rack::Cors do
+#   allow do
+#     origins 'http://localhost:5173'  # your frontend origin
+#     resource '*',
+#       headers: :any,
+#       expose: ['Authorization'],
+#       methods: [:get, :post, :put, :patch, :delete, :options, :head],
+#       credentials: true
+#   end
+# end
+
+
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*' # dev only. restrict for prod.
+    origins 'https://afp.connectorcore.com'  # your frontend domain
     resource '*',
       headers: :any,
+      expose: ['Authorization'],
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      expose: ['Authorization']
+      credentials: true
   end
 end
+
