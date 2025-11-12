@@ -52,7 +52,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :contents, only: [:index, :show, :create, :destroy]
+      resources :contents, only: [:index, :show, :create, :destroy, :update]
       resources :assignments, only: [:index, :show, :create, :update, :destroy]
       # post "assignments", to: "assignments#create"
       get "screen_contents/:screen_id", to: "screen_contents#show"

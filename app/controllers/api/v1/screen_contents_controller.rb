@@ -216,6 +216,7 @@ class Api::V1::ScreenContentsController < ApplicationController
         position: c.position,
         content: c.content,
         hyperlink: c.hyperlink,
+        transition_effect: c.transition_effect,
         qr_code_url: c.qr_code.attached? ?
           Rails.application.routes.url_helpers.rails_blob_url(c.qr_code, host: "https://backendafp.connectorcore.com") : nil,
         files: c.files.map { |f|
