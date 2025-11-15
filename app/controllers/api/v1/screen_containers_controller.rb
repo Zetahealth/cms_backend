@@ -30,7 +30,13 @@ class Api::V1::ScreenContainersController < ApplicationController
 
         # ✅ Container images
         background_url: container.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(container.background, host: "https://backendafp.connectorcore.com") : nil,
-        files: container.files.map { |f| url_for(f) },
+        # files: container.files.map { |f| url_for(f) },
+        files: container.files.map { |f|
+          Rails.application.routes.url_helpers.rails_blob_url(
+            f,
+            host: "https://backendafp.connectorcore.com"
+          )
+        },
 
         # ✅ Screens with images
         screens: container.screens.map { |s|
