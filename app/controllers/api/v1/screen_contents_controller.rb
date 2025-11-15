@@ -227,7 +227,9 @@ class Api::V1::ScreenContentsController < ApplicationController
 
     render json: {
       background_url: background_url,
-      contents: contents
+      contents: contents,
+      display_mode: screen.display_mode,
+      id: screen.id
     }
   end
 end

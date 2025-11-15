@@ -9,6 +9,8 @@ class Screen < ApplicationRecord
 
     has_many :screen_container_assignments
     has_many :screen_containers, through: :screen_container_assignments
+    has_one_attached :card_image
+
     
     private
 
