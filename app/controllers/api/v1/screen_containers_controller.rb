@@ -29,7 +29,7 @@ class Api::V1::ScreenContainersController < ApplicationController
         display_mode: container.display_mode,
 
         # ✅ Container images
-        background_url: container.background.attached? ? url_for(container.background) : nil,
+        background_url: container.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(container.background, host: "https://backendafp.connectorcore.com") : nil,
         files: container.files.map { |f| url_for(f) },
 
         # ✅ Screens with images
@@ -38,10 +38,10 @@ class Api::V1::ScreenContainersController < ApplicationController
             id: s.id,
             name: s.name,
             slug: s.slug,
-            background_url: s.background.attached? ? url_for(s.background) : nil,
+            background_url: s.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.background, host: "https://backendafp.connectorcore.com") : nil,
             display_mode: s.display_mode,
             title: s.title,
-            card_image_url: s.card_image.attached? ? url_for(s.card_image) : nil
+            card_image_url: s.card_image.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.card_image, host: "https://backendafp.connectorcore.com") : nil,
             # files: s.background.map { |f| url_for(f) }
           }
         }
