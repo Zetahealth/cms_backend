@@ -186,7 +186,7 @@ class Api::V1::ScreenContentsController < ApplicationController
 
   def show
     screen = Screen.find_by(slug: params[:slug]) || Screen.find(params[:screen_id])
-
+    container_ids = screen.screen_containers.pluck(:id)
     # Find all screen IDs in same container(s)
     container_screen_ids = Screen.joins(:screen_containers)
                                  .where(screen_containers: { id: screen.screen_containers.pluck(:id) })
@@ -216,19 +216,26 @@ class Api::V1::ScreenContentsController < ApplicationController
         position: c.position,
         content: c.content,
         hyperlink: c.hyperlink,
+        
+        
         transition_effect: c.transition_effect,
         qr_code_url: c.qr_code.attached? ?
           Rails.application.routes.url_helpers.rails_blob_url(c.qr_code, host: "https://backendafp.connectorcore.com") : nil,
         files: c.files.map { |f|
           Rails.application.routes.url_helpers.rails_blob_url(f, host: "https://backendafp.connectorcore.com")
-        }
+        },
+        logo: c.logo.attached? ?
+          Rails.application.routes.url_helpers.rails_blob_url(c.logo, host: "https://backendafp.connectorcore.com") : nil,
+
       }
     end
 
     render json: {
       background_url: background_url,
       contents: contents,
+      container_ids: container_ids,
       display_mode: screen.display_mode,
+      screen_name: screen.title,
       id: screen.id
     }
   end

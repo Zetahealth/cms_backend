@@ -105,7 +105,7 @@ Rails.application.configure do
    /http:\/\/127\.0\.0\.1:\d+/,
    /https:\/\/backendafp\.connectorcore\.com/
   ]
-
+  
   routes.default_url_options = { host: "https://backendafp.connectorcore.com" }
 
   #config.hosts << "backendafp.connectorcore.com"
@@ -115,6 +115,8 @@ Rails.application.configure do
     host: "https://backendafp.connectorcore.com"
   
   }
+
+  config.action_cable.url = "ws://backendafp.connectorcore.com/cable"
  
   config.hosts << "backendafp.connectorcore.com"
   config.hosts << "puma_4000"

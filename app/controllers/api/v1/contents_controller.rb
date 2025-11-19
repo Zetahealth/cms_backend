@@ -40,35 +40,43 @@ class Api::V1::ContentsController < ApplicationController
     # end
 
 
-
     def create
-        c = Content.new(content_params)
-        if c.save
-            # ✅ Handle single or multiple file uploads
-            if params[:files].present?
-            if params[:files].is_a?(Array)
-                params[:files].each { |f| c.files.attach(f) }
-            else
-                c.files.attach(params[:files])
-            end
-            end
+    c = Content.new(content_params)
 
-            # ✅ Generate QR code if hyperlink present
-            if c.hyperlink.present?
-            qrcode = RQRCode::QRCode.new(c.hyperlink)
-            png = qrcode.as_png(size: 200)
-            c.qr_code.attach(
-                io: StringIO.new(png.to_s),
-                filename: "qr_code.png",
-                content_type: "image/png"
-            )
-            end
+    if c.save
 
-            render json: content_serializer(c), status: :created
+        # Handle multiple attached files
+        if params[:files].present?
+        if params[:files].is_a?(Array)
+            params[:files].each { |f| c.files.attach(f) }
         else
-            render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
+            c.files.attach(params[:files])
         end
+        end
+
+        # Optional Logo Upload
+        if params[:logo].present?
+        c.logo.attach(params[:logo])
+        end
+
+        # Generate QR Code only if hyperlink exists
+        if c.hyperlink.present?
+        qrcode = RQRCode::QRCode.new(c.hyperlink)
+        png = qrcode.as_png(size: 200)
+
+        c.qr_code.attach(
+            io: StringIO.new(png.to_s),
+            filename: "qr_code.png",
+            content_type: "image/png"
+        )
+        end
+
+        render json: content_serializer(c), status: :created
+    else
+        render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
     end
+    end
+
 
 
     def update
@@ -83,6 +91,12 @@ class Api::V1::ContentsController < ApplicationController
             else
             c.files.attach(params[:files])
             end
+        end
+
+        # ✅ Replace logo if a new one is uploaded
+        if params[:logo].present?
+        c.logo.purge if c.logo.attached?
+        c.logo.attach(params[:logo])
         end
 
         # ✅ Regenerate QR code if hyperlink updated
@@ -107,7 +121,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect, files: [])
+    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect,:logo, files: [])
     end
 
     def content_serializer(c)

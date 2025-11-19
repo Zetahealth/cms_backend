@@ -12,6 +12,11 @@ class Api::V1::AssignmentsController < ApplicationController
 
     def destroy
         assignment = Assignment.find(params[:id])
+        if params[:id].present?
+            assesnment = Assignment.find(params[:id])
+            screen = Screen.find(assesnment.screen_id) if assesnment.screen_id.present?
+            ScreenBroadcaster.refresh(screen) if screen.present?
+        end
         assignment.destroy
         render json: { message: "Assignment removed" }
     end
@@ -26,13 +31,11 @@ class Api::V1::AssignmentsController < ApplicationController
             end_at: params[:end_at]
         )
 
-        # broadcast change to channel for that screen
-        # ActionCable.server.broadcast "screen_#{assignment.screen.slug}_channel", { action: 'assignment_changed' }
-        # ActionCable.server.broadcast(
-        #     "screen_#{assignment.screen.id}_channel",
-        #     action: "assignment_changed",
-        #     message: "Content assigned"
-        # )
+        if params[:screen_id].present?
+            screen = Screen.find(params[:screen_id])
+            ScreenBroadcaster.refresh(screen)
+        end
+
         render json: assignment, status: :created
         rescue => e
         render json: { error: e.message }, status: :unprocessable_entity

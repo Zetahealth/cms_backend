@@ -1,5 +1,5 @@
 class Api::V1::ScreenContainersController < ApplicationController
-  skip_before_action :authorize_request, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy]
+  skip_before_action :authorize_request, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy , :update]
 
   def index
     containers = ScreenContainer.includes(:screens).all
@@ -119,6 +119,10 @@ class Api::V1::ScreenContainersController < ApplicationController
 
   def unassign_screen
     container = ScreenContainer.find(params[:id])
+    if params[:screen_id].present?
+      ScreenBroadcaster.container_refresh(container)
+    end
+
     screen = Screen.find(params[:screen_id])
     container.screens.delete(screen)
     render json: { message: "Screen unassigned successfully" }
@@ -128,6 +132,46 @@ class Api::V1::ScreenContainersController < ApplicationController
     ScreenContainer.find(params[:id]).destroy
     render json: { message: "Deleted" }
   end
+
+
+    # UPDATE CONTAINER
+  def update
+    c = ScreenContainer.find(params[:id])
+
+    # Update simple fields
+    c.update(
+      name: params[:name],
+      content_type: params[:content_type],
+      transition_effect: params[:transition_effect]
+    )
+
+    # -------------------------
+    # REPLACE CARD IMAGE (ONE FILE ONLY)
+    # -------------------------
+    if params[:files].present?
+      c.files.purge                   # remove all existing
+      c.files.attach(params[:files])   # attach ONLY ONE file
+    end
+
+    # -------------------------
+    # REPLACE BACKGROUND
+    # -------------------------
+    if params[:background].present?
+      c.background.purge
+      c.background.attach(params[:background])
+    end
+
+    render json: {
+      id: c.id,
+      name: c.name,
+      content_type: c.content_type,
+      display_mode: c.display_mode,
+      background_url: c.background.attached? ? url_for(c.background) : nil,
+      files: c.files.map { |f| url_for(f) },
+      screens: c.screens.map { |s| { id: s.id, name: s.name } }
+    }
+  end
+
 
 
   private
