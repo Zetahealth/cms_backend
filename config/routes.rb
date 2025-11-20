@@ -52,6 +52,8 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :sub_contents
+
       resources :contents, only: [:index, :show, :create, :destroy, :update]
       resources :assignments, only: [:index, :show, :create, :update, :destroy]
       # post "assignments", to: "assignments#create"

@@ -116,7 +116,7 @@ Rails.application.configure do
   
   }
 
-  config.action_cable.url = "ws://backendafp.connectorcore.com/cable"
+  config.action_cable.url = "wss://backendafp.connectorcore.com/cable"
  
   config.hosts << "backendafp.connectorcore.com"
   config.hosts << "puma_4000"

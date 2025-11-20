@@ -18,6 +18,7 @@ class Content < ApplicationRecord
   after_create :update_live_screen
   after_update :update_live_screen
   after_destroy :update_live_screen
+  has_many :sub_contents, dependent: :destroy
 
   private
 

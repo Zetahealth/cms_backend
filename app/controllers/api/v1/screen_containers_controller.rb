@@ -10,7 +10,8 @@ class Api::V1::ScreenContainersController < ApplicationController
         content_type: c.content_type,
         transition_effect: c.transition_effect,
         display_mode: c.display_mode,
-        background_url: c.background.attached? ? url_for(c.background) : nil,
+        # background_url: c.background.attached? ? url_for(c.background) : nil,
+        background_url: c.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(c.background, host: "http://localhost:3000") : nil,
         files: c.files.map { |f| url_for(f) },
         screens: c.screens.map { |s| { id: s.id, name: s.name, slug: s.slug, display_mode: s.display_mode } }
       }
@@ -29,12 +30,12 @@ class Api::V1::ScreenContainersController < ApplicationController
         display_mode: container.display_mode,
 
         # ✅ Container images
-        background_url: container.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(container.background, host: "https://backendafp.connectorcore.com") : nil,
+        background_url: container.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(container.background, host: "http://localhost:3000") : nil,
         # files: container.files.map { |f| url_for(f) },
         files: container.files.map { |f|
           Rails.application.routes.url_helpers.rails_blob_url(
             f,
-            host: "https://backendafp.connectorcore.com"
+            host: "http://localhost:3000"
           )
         },
 
@@ -44,10 +45,10 @@ class Api::V1::ScreenContainersController < ApplicationController
             id: s.id,
             name: s.name,
             slug: s.slug,
-            background_url: s.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.background, host: "https://backendafp.connectorcore.com") : nil,
+            background_url: s.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.background, host: "http://localhost:3000") : nil,
             display_mode: s.display_mode,
             title: s.title,
-            card_image_url: s.card_image.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.card_image, host: "https://backendafp.connectorcore.com") : nil,
+            card_image_url: s.card_image.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.card_image, host: "http://localhost:3000") : nil,
             # files: s.background.map { |f| url_for(f) }
           }
         }
