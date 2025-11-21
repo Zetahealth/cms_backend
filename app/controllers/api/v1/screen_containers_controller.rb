@@ -35,7 +35,7 @@ class Api::V1::ScreenContainersController < ApplicationController
         files: container.files.map { |f|
           Rails.application.routes.url_helpers.rails_blob_url(
             f,
-            host: "https://backendafp.connectorcore.com0"
+            host: "https://backendafp.connectorcore.com"
           )
         },
 
