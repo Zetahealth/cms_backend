@@ -20,6 +20,9 @@ class Api::V1::SubContentsController < ApplicationController
     sc = SubContent.new(sub_content_params)
 
     sc.main_image.attach(params[:main_image]) if params[:main_image].present?
+    sc.sub_image.attach(params[:sub_image]) if params[:sub_image].present?
+
+
     sc.qr_code.attach(params[:qr_code]) if params[:qr_code].present?
 
     if params[:gallery_images].present?
@@ -59,7 +62,7 @@ class Api::V1::SubContentsController < ApplicationController
   end
 
   def sub_content_params
-    params.permit(:title, :content_id, :description, :metadata)
+    params.permit(:title, :content_id, :description, :metadata , :individual_contents)
   end
 
   def sc_data(sc)

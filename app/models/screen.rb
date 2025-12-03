@@ -9,6 +9,26 @@ class Screen < ApplicationRecord
 
     has_many :screen_container_assignments
     has_many :screen_containers, through: :screen_container_assignments
+
+
+    # has_many :screen_sub_container_assignments
+    # has_many :screen_sub_containers, through: :screen_sub_container_assignments
+
+
+    has_many :screen_sub_container_assignments
+    has_many :subscreen_containers,
+           through: :screen_sub_container_assignments,
+           source: :screen_container
+
+    # has_many :screen_container_assignments
+    # has_many :containers, through: :screen_container_assignments   # <– MAIN
+
+    # has_many :screen_sub_container_assignments
+    # has_many :sub_containers, through: :screen_sub_container_assignments  # <– SECOND
+
+
+
+    
     has_one_attached :card_image
 
     after_create :update_live_screen

@@ -9,6 +9,7 @@ class Content < ApplicationRecord
   has_many_attached :files
   has_one_attached :qr_code
   has_one_attached :logo
+  has_one_attached :background
   
   has_many :assignments, dependent: :destroy
   validates :content_type, presence: true

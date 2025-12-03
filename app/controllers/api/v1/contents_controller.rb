@@ -59,6 +59,12 @@ class Api::V1::ContentsController < ApplicationController
         c.logo.attach(params[:logo])
         end
 
+        if params[:background].present?
+            c.background.attach(params[:background])
+        end
+
+        
+
         # Generate QR Code only if hyperlink exists
         if c.hyperlink.present?
         qrcode = RQRCode::QRCode.new(c.hyperlink)
@@ -99,6 +105,15 @@ class Api::V1::ContentsController < ApplicationController
         c.logo.attach(params[:logo])
         end
 
+        if params[:background].present?
+            c.background.purge if c.background.attached?
+            c.background.attach(params[:background])
+        end
+
+
+
+
+
         # ✅ Regenerate QR code if hyperlink updated
         if params[:hyperlink].present?
             c.qr_code.purge if c.qr_code.attached?
@@ -121,7 +136,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect,:logo, files: [])
+    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect,:logo,:background ,:dob ,:display_mode , files: [])
     end
 
     def content_serializer(c)
@@ -134,6 +149,9 @@ class Api::V1::ContentsController < ApplicationController
         hyperlink: c.hyperlink,
         transition_effect: c.transition_effect,
         files: c.files.map { |f| rails_blob_url(f, only_path: false) },
+        # background_url: c.background.map { |f| rails_blob_url(f, only_path: false) },
+        dob: c.dob,
+        display_mode: c.display_mode,
         created_at: c.created_at
     }
     end

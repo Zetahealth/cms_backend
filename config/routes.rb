@@ -49,6 +49,9 @@ Rails.application.routes.draw do
         member do
           post :assign_screen
           delete :unassign_screen
+          post :assign_sub_screen
+          delete :unassign_sub_screen
+          get :more_screens
         end
       end
 
@@ -58,6 +61,11 @@ Rails.application.routes.draw do
       resources :assignments, only: [:index, :show, :create, :update, :destroy]
       # post "assignments", to: "assignments#create"
       get "screen_contents/:screen_id", to: "screen_contents#show"
+
+
+
+
+
     end
   end
 

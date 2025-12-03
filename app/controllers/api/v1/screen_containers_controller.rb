@@ -1,5 +1,5 @@
 class Api::V1::ScreenContainersController < ApplicationController
-  skip_before_action :authorize_request, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy , :update]
+  skip_before_action :authorize_request, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy , :update, :assign_sub_screen, :unassign_sub_screen , :more_screens]
 
   def index
     containers = ScreenContainer.includes(:screens).all
@@ -12,8 +12,12 @@ class Api::V1::ScreenContainersController < ApplicationController
         display_mode: c.display_mode,
         # background_url: c.background.attached? ? url_for(c.background) : nil,
         background_url: c.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(c.background, host: "https://backendafp.connectorcore.com") : nil,
+        subbackground_url: c.subbackground.attached? ? Rails.application.routes.url_helpers.rails_blob_url(c.subbackground, host: "https://backendafp.connectorcore.com") : nil,
         files: c.files.map { |f| url_for(f) },
-        screens: c.screens.map { |s| { id: s.id, name: s.name, slug: s.slug, display_mode: s.display_mode } }
+        screens: c.screens.map { |s| { id: s.id, name: s.name, slug: s.slug, display_mode: s.display_mode } },
+        subscreens: c.subscreens.map { |ss|
+          { id: ss.id, name: ss.name, slug: ss.slug, display_mode: ss.display_mode }
+        }
       }
     }
   end
@@ -21,7 +25,6 @@ class Api::V1::ScreenContainersController < ApplicationController
 
   def show
       container = ScreenContainer.includes(:screens).find(params[:id])
-
       render json: {
         id: container.id,
         name: container.name,
@@ -83,7 +86,7 @@ class Api::V1::ScreenContainersController < ApplicationController
   # end
 
   def create
-    container = ScreenContainer.new(container_params.except(:files, :background))
+    container = ScreenContainer.new(container_params.except(:files, :background , :subbackground))
 
     if params[:files].present?
       Array(params[:files]).each { |f| container.files.attach(f) }
@@ -92,6 +95,11 @@ class Api::V1::ScreenContainersController < ApplicationController
     if params[:background].present?
       container.background.attach(params[:background])
     end
+
+    if params[:subbackground].present?
+      container.subbackground.attach(params[:subbackground])
+    end
+    
 
     if container.save
       render json: {
@@ -118,6 +126,15 @@ class Api::V1::ScreenContainersController < ApplicationController
     render json: { message: "Screen assigned successfully" }
   end
 
+
+  def assign_sub_screen
+    container = ScreenContainer.find(params[:id])
+    screen = Screen.find(params[:screen_id])
+    container.subscreens << screen unless container.subscreens.include?(screen)
+    render json: { message: "SubScreen assigned successfully" }
+  end
+
+
   def unassign_screen
     container = ScreenContainer.find(params[:id])
     if params[:screen_id].present?
@@ -128,6 +145,20 @@ class Api::V1::ScreenContainersController < ApplicationController
     container.screens.delete(screen)
     render json: { message: "Screen unassigned successfully" }
   end
+
+
+  def unassign_sub_screen
+    container = ScreenContainer.find(params[:id])
+    if params[:screen_id].present?
+      ScreenBroadcaster.container_refresh(container)
+    end
+
+    screen = Screen.find(params[:screen_id])
+    container.subscreens.delete(screen)
+    render json: { message: "Screen unassigned successfully" }
+  end
+
+
 
   def destroy
     ScreenContainer.find(params[:id]).destroy
@@ -162,12 +193,19 @@ class Api::V1::ScreenContainersController < ApplicationController
       c.background.attach(params[:background])
     end
 
+    if params[:subbackground].present?
+      c.subbackground.purge
+      c.subbackground.attach(params[:subbackground])
+    end
+    
+
     render json: {
       id: c.id,
       name: c.name,
       content_type: c.content_type,
       display_mode: c.display_mode,
       background_url: c.background.attached? ? url_for(c.background) : nil,
+      subbackground_url: c.subbackground.attached? ? url_for(c.subbackground) : nil,
       files: c.files.map { |f| url_for(f) },
       screens: c.screens.map { |s| { id: s.id, name: s.name } }
     }
@@ -175,9 +213,47 @@ class Api::V1::ScreenContainersController < ApplicationController
 
 
 
+
+  def more_screens
+
+    container = ScreenContainer.includes(:subscreens).find(params[:id])
+      render json: {
+        id: container.id,
+        name: container.name,
+        content_type: container.content_type,
+        transition_effect: container.transition_effect,
+        display_mode: container.display_mode,
+
+        # ✅ Container images
+        background_url: container.subbackground.attached? ? Rails.application.routes.url_helpers.rails_blob_url(container.subbackground, host: "https://backendafp.connectorcore.com") : nil,
+        # files: container.files.map { |f| url_for(f) },
+        files: container.files.map { |f|
+          Rails.application.routes.url_helpers.rails_blob_url(
+            f,
+            host: "https://backendafp.connectorcore.com"
+          )
+        },
+        subscreens: container.subscreens.map { |s|
+          {
+            id: s.id,
+            name: s.name,
+            slug: s.slug,
+            background_url: s.background.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.background, host: "https://backendafp.connectorcore.com") : nil,
+            display_mode: s.display_mode,
+            title: s.title,
+            card_image_url: s.card_image.attached? ? Rails.application.routes.url_helpers.rails_blob_url(s.card_image, host: "https://backendafp.connectorcore.com") : nil,
+            # files: s.background.map { |f| url_for(f) }
+          }
+        }
+      }
+
+  end
+
+
+
   private
   def container_params
-    params.permit(:name, :content_type, :transition_effect, :background, :display_mode, files: [] )
+    params.permit(:name, :content_type, :transition_effect, :background, :subbackground ,:display_mode, files: [] )
   end
 
 end

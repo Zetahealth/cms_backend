@@ -159,24 +159,43 @@ class Api::V1::ScreenContentsController < ApplicationController
 
     container_ids = screen.screen_containers.pluck(:id)
 
-    # Fetch container files (ONLY files)
-    container_files = screen.screen_containers.flat_map do |container|
-      container.files.map do |f|
-        Rails.application.routes.url_helpers.rails_blob_url(
-          f,
-          host: "https://backendafp.connectorcore.com"
-        )
+    
+    if container_ids.blank?
+      container_ids = screen.subscreen_containers.pluck(:id)
+
+      container_files = screen.subscreen_containers.flat_map do |container|
+        container.files.map do |f|
+          Rails.application.routes.url_helpers.rails_blob_url(
+            f,
+            host: "https://backendafp.connectorcore.com"
+          )
+        end
       end
-    end
-
-
-
-
-    container_screen_ids = Screen.joins(:screen_containers)
+      container_screen_ids = Screen.joins(:subscreen_containers)
                                  .where(screen_containers: { id: screen.screen_containers.pluck(:id) })
                                  .order(:id)
                                  .pluck(:id)
                                  .uniq
+    else
+      container_files = screen.screen_containers.flat_map do |container|
+        container.files.map do |f|
+          Rails.application.routes.url_helpers.rails_blob_url(
+            f,
+            host: "https://backendafp.connectorcore.com"
+          )
+        end
+      end
+      container_screen_ids = Screen.joins(:screen_containers)
+                                 .where(screen_containers: { id: screen.screen_containers.pluck(:id) })
+                                 .order(:id)
+                                 .pluck(:id)
+                                 .uniq
+    end
+
+    puts container_ids.inspect
+ 
+
+    # Fetch container files (ONLY files)
 
     current_index = container_screen_ids.index(screen.id)
     prev_screen_id = current_index && current_index > 0 ? container_screen_ids[current_index - 1] : nil
@@ -197,7 +216,12 @@ class Api::V1::ScreenContentsController < ApplicationController
         {
           id: sub.id,
           description: sub.description,
-
+          title: sub.title,
+          individual_contents: sub.individual_contents,
+          sub_image: sub.sub_image.attached? ?
+            Rails.application.routes.url_helpers.rails_blob_url(sub.sub_image, host: "https://backendafp.connectorcore.com")
+            : nil,
+          
           main_image: sub.main_image.attached? ?
             Rails.application.routes.url_helpers.rails_blob_url(sub.main_image, host: "https://backendafp.connectorcore.com")
             : nil,
@@ -216,11 +240,16 @@ class Api::V1::ScreenContentsController < ApplicationController
         current_screen_id: screen.id,
         next_screen_id: next_screen_id,
         prev_screen_id: prev_screen_id,
-
+        dob:  c.dob,
+        
         position: c.position,
         content: c.content,
         hyperlink: c.hyperlink,
         transition_effect: c.transition_effect,
+
+        background_url: c.background.attached? ?
+          Rails.application.routes.url_helpers.rails_blob_url(c.background, host: "https://backendafp.connectorcore.com")
+          : nil,
 
         qr_code_url: c.qr_code.attached? ?
           Rails.application.routes.url_helpers.rails_blob_url(c.qr_code, host: "https://backendafp.connectorcore.com")
@@ -248,7 +277,7 @@ class Api::V1::ScreenContentsController < ApplicationController
       container_ids: container_ids,
       container_files: container_files, 
       display_mode: screen.display_mode,
-      screen_name: screen.title,
+      screen_name: screen.name,
       id: screen.id
     }
   end
