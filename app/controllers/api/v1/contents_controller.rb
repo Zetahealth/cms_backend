@@ -136,7 +136,7 @@ class Api::V1::ContentsController < ApplicationController
 
     private
     def content_params
-    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect,:logo,:background ,:dob ,:display_mode , files: [])
+    params.permit(:title, :content_type, :metadata ,:content ,:position ,:hyperlink , :transition_effect,:logo,:background ,:dob ,:display_mode ,:view_mode , files: [])
     end
 
     def content_serializer(c)
@@ -151,6 +151,7 @@ class Api::V1::ContentsController < ApplicationController
         files: c.files.map { |f| rails_blob_url(f, only_path: false) },
         # background_url: c.background.map { |f| rails_blob_url(f, only_path: false) },
         dob: c.dob,
+        view_mode: c.view_mode,
         display_mode: c.display_mode,
         created_at: c.created_at
     }

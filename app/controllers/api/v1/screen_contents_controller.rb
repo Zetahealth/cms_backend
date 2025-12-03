@@ -241,7 +241,7 @@ class Api::V1::ScreenContentsController < ApplicationController
         next_screen_id: next_screen_id,
         prev_screen_id: prev_screen_id,
         dob:  c.dob,
-        
+        view_mode: c.view_mode,
         position: c.position,
         content: c.content,
         hyperlink: c.hyperlink,
