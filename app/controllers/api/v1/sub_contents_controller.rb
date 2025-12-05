@@ -21,7 +21,7 @@ class Api::V1::SubContentsController < ApplicationController
 
     sc.main_image.attach(params[:main_image]) if params[:main_image].present?
     sc.sub_image.attach(params[:sub_image]) if params[:sub_image].present?
-
+    sc.sub_image2.attach(params[:sub_image2]) if params[:sub_image2].present?
 
     sc.qr_code.attach(params[:qr_code]) if params[:qr_code].present?
 
@@ -41,6 +41,8 @@ class Api::V1::SubContentsController < ApplicationController
 
     @sub_content.main_image.attach(params[:main_image]) if params[:main_image]
     @sub_content.qr_code.attach(params[:qr_code]) if params[:qr_code]
+    @sub_content.sub_image.attach(params[:sub_image]) if params[:sub_image]
+    @sub_content.sub_image2.attach(params[:sub_image2]) if params[:sub_image2]
 
     if params[:gallery_images]
       @sub_content.gallery_images.purge

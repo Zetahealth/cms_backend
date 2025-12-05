@@ -18,7 +18,7 @@
 #     assignments = screen.assignments.includes(:content).order(:position)
 
 #     background_url = screen.background.attached? ? 
-#       Rails.application.routes.url_helpers.rails_blob_url(screen.background, host: "http://localhost:3000") : nil
+#       Rails.application.routes.url_helpers.rails_blob_url(screen.background, host: "https://backendafp.connectorcore.com") : nil
 
 #     contents = assignments.map do |a|
 #       c = a.content
@@ -37,12 +37,12 @@
         
 #         transition_effect: c.transition_effect,
 #         qr_code_url: c.qr_code.attached? ?
-#           Rails.application.routes.url_helpers.rails_blob_url(c.qr_code, host: "http://localhost:3000") : nil,
+#           Rails.application.routes.url_helpers.rails_blob_url(c.qr_code, host: "https://backendafp.connectorcore.com") : nil,
 #         files: c.files.map { |f|
-#           Rails.application.routes.url_helpers.rails_blob_url(f, host: "http://localhost:3000")
+#           Rails.application.routes.url_helpers.rails_blob_url(f, host: "https://backendafp.connectorcore.com")
 #         },
 #         logo: c.logo.attached? ?
-#           Rails.application.routes.url_helpers.rails_blob_url(c.logo, host: "http://localhost:3000") : nil,
+#           Rails.application.routes.url_helpers.rails_blob_url(c.logo, host: "https://backendafp.connectorcore.com") : nil,
 
 #       }
 #     end
@@ -81,7 +81,7 @@
 #     # Background
 #     background_url = screen.background.attached? ?
 #       Rails.application.routes.url_helpers.rails_blob_url(
-#         screen.background, host: "http://localhost:3000"
+#         screen.background, host: "https://backendafp.connectorcore.com"
 #       ) : nil
 
 #     contents = assignments.map do |a|
@@ -94,11 +94,11 @@
 #           description: sub.description,
 #           main_image: sub.main_image.attached? ?
 #             Rails.application.routes.url_helpers.rails_blob_url(
-#               sub.main_image, host: "http://localhost:3000"
+#               sub.main_image, host: "https://backendafp.connectorcore.com"
 #             ) : nil,
 
 #           gallery_images: sub.gallery_images.map {
-#             |img| Rails.application.routes.url_helpers.rails_blob_url(img, host: "http://localhost:3000")
+#             |img| Rails.application.routes.url_helpers.rails_blob_url(img, host: "https://backendafp.connectorcore.com")
 #           },
 
 #         }
@@ -121,18 +121,18 @@
 
 #         qr_code_url: c.qr_code.attached? ?
 #           Rails.application.routes.url_helpers.rails_blob_url(
-#             c.qr_code, host: "http://localhost:3000"
+#             c.qr_code, host: "https://backendafp.connectorcore.com"
 #           ) : nil,
 
 #         files: c.files.map {
 #           |f| Rails.application.routes.url_helpers.rails_blob_url(
-#             f, host: "http://localhost:3000"
+#             f, host: "https://backendafp.connectorcore.com"
 #           )
 #         },
 
 #         logo: c.logo.attached? ?
 #           Rails.application.routes.url_helpers.rails_blob_url(
-#             c.logo, host: "http://localhost:3000"
+#             c.logo, host: "https://backendafp.connectorcore.com"
 #           ) : nil,
 
 #         # 🔥 ADD SUBCONTENTS HERE
@@ -220,6 +220,9 @@ class Api::V1::ScreenContentsController < ApplicationController
           individual_contents: sub.individual_contents,
           sub_image: sub.sub_image.attached? ?
             Rails.application.routes.url_helpers.rails_blob_url(sub.sub_image, host: "https://backendafp.connectorcore.com")
+            : nil,
+          sub_image2: sub.sub_image2.attached? ?
+            Rails.application.routes.url_helpers.rails_blob_url(sub.sub_image2, host: "https://backendafp.connectorcore.com")
             : nil,
           
           main_image: sub.main_image.attached? ?

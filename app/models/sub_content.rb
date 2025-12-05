@@ -4,4 +4,5 @@ class SubContent < ApplicationRecord
     has_many_attached :gallery_images
     has_one_attached :qr_code
     has_one_attached :sub_image
+    has_one_attached :sub_image2
 end
