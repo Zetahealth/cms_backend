@@ -3,7 +3,9 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
-  skip_before_action :authorize_request, only: [:create]
+  # skip_before_action :authorize_request, only: [:create]
+  skip_before_action :authenticate_user!, only: [:create]
+
   # before_action :authorize_request, only: [:change_password]
 
   # GET /resource/sign_up
@@ -65,6 +67,15 @@ class Users::RegistrationsController < Devise::RegistrationsController
     build_resource(sign_up_params)
 
     if resource.save
+      # UserLog.create(users: resource, event_type: "USER_CREATED", details: "New user account created")
+      
+      UserLog.create(
+        user: resource, 
+        event_type: "USER_CREATED", 
+        details: "New user account created"
+      )
+
+      
       token = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil).first
       render json: {
         message: "User registered successfully",

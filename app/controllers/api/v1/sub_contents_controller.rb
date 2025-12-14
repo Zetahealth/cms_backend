@@ -1,7 +1,7 @@
 # class Api::V1::SubContentsController < ApplicationController
 # end
 class Api::V1::SubContentsController < ApplicationController
-  skip_before_action :authorize_request, only: [:index, :show, :create, :update, :destroy]
+  skip_before_action :authenticate_user!, only: [:index, :show]
   before_action :set_sub_content, only: [:show, :update, :destroy]
 
   def index

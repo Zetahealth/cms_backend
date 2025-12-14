@@ -305,7 +305,18 @@ Devise.setup do |config|
   config.responder.error_status = :unprocessable_entity
   config.responder.redirect_status = :see_other
 
-  
+  config.jwt do |jwt|
+    jwt.secret = Rails.application.secret_key_base
+    jwt.dispatch_requests = [
+      ['POST', %r{^/users/sign_in$}],
+      ['POST', %r{^/users$}]
+    ]
+    jwt.revocation_requests = [
+      ['DELETE', %r{^/users/sign_out$}]
+    ]
+    # jwt.expiration_time = 1.day.to_i
+  end
+
 
   # ==> Configuration for :registerable
 

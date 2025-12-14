@@ -1,6 +1,6 @@
 class Api::V1::ScreensController < ApplicationController
-    # before_action :authorize_request, except: [:index, :show]
-    skip_before_action :authorize_request, only: [:index, :show, :create, :update, :destroy, :upload_background]
+    before_action :authenticate_user!, only: [:create,  :update, :destroy, :upload_background]
+    skip_before_action :authenticate_user!, only: [:index, :show]
 
     def index
     render json: Screen.all
@@ -28,6 +28,14 @@ class Api::V1::ScreensController < ApplicationController
     end
 
     if screen.save
+      puts "Current User--------------------: #{current_user.inspect}"
+      UserLog.create(
+        user: current_user, 
+        event_type: "SCREEN_CREATED", 
+        details: "A user created a new screen named: '#{screen.name}'"
+      )
+
+
       render json: {
         id: screen.id,
         name: screen.name,
@@ -39,9 +47,15 @@ class Api::V1::ScreensController < ApplicationController
       render json: { errors: screen.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
   def update
     s = Screen.find(params[:id])
     if s.update(screen_params)
+      UserLog.create(
+        user: current_user, 
+        event_type: "SCREEN_UPDATED", 
+        details: "A user updated a new screen named: '#{s.name}'"
+      )
         render json: s
     else
         render json: { errors: s.errors.full_messages }, status: :unprocessable_entity
@@ -50,6 +64,11 @@ class Api::V1::ScreensController < ApplicationController
 
   def destroy
       s = Screen.find(params[:id])
+      UserLog.create(
+        user: current_user, 
+        event_type: "SCREEN_DELETED", 
+        details: "A user updated a new screen named: '#{s.name}'"
+      )
       s.destroy
       head :no_content
   end
@@ -57,6 +76,11 @@ class Api::V1::ScreensController < ApplicationController
   def upload_background
     screen = Screen.find(params[:id])
     if params[:background].present?
+      UserLog.create(
+        user: current_user, 
+        event_type: "SCREEN_BACKGROUND_UPLOADED", 
+        details: "A user updated a new screen named: #{screen.name}"
+      )
       screen.background.attach(params[:background])
       render json: { message: "Background uploaded successfully", url: url_for(screen.background) }
     else

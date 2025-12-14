@@ -1,6 +1,6 @@
 class Api::V1::ContentsController < ApplicationController
-    # before_action :authorize_request, except: [:index, :show]
-    skip_before_action :authorize_request, only: [:index, :show, :create , :destroy , :update]
+    before_action :authenticate_user!, except: [:create , :update, :destroy]
+    skip_before_action :authenticate_user!, only: [:index, :show,]
 
 
     include Rails.application.routes.url_helpers
@@ -44,6 +44,11 @@ class Api::V1::ContentsController < ApplicationController
     c = Content.new(content_params)
 
     if c.save
+        UserLog.create(
+        user: current_user, 
+        event_type: "CONTENT_CREATED", 
+        details: "A user created a new content named: '#{c.title}' "
+      )
 
         # Handle multiple attached files
         if params[:files].present?
@@ -89,6 +94,13 @@ class Api::V1::ContentsController < ApplicationController
         c = Content.find(params[:id])
 
         if c.update(content_params)
+
+        UserLog.create(
+            user: current_user, 
+            event_type: "CONTENT_UPDATED", 
+            details: "A user created a new content named: '#{c.title}' "
+        )
+
         # ✅ Replace files if new ones are uploaded
         if params[:files].present?
             c.files.purge # remove old files
@@ -129,9 +141,14 @@ class Api::V1::ContentsController < ApplicationController
 
 
     def destroy
-    c = Content.find(params[:id])
-    c.destroy
-    head :no_content
+        c = Content.find(params[:id])
+        UserLog.create(
+            user: current_user, 
+            event_type: "CONTENT_DELETED", 
+            details: "A user created a new content named: '#{c.title}' "
+        )
+        c.destroy
+        head :no_content
     end
 
     private

@@ -62,7 +62,7 @@ Rails.application.routes.draw do
       # post "assignments", to: "assignments#create"
       get "screen_contents/:screen_id", to: "screen_contents#show"
 
-
+      get "/logs", to: "user_logs#index"
 
 
 

@@ -3,8 +3,8 @@ class Screen < ApplicationRecord
     has_many :contents, through: :assignments
     before_validation :generate_slug, on: :create
 
-    validates :name, presence: true
-    validates :slug, uniqueness: true
+    # validates :name, presence: true
+    # validates :slug, uniqueness: true
     has_one_attached :background
 
     has_many :screen_container_assignments

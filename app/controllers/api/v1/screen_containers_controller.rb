@@ -1,5 +1,5 @@
 class Api::V1::ScreenContainersController < ApplicationController
-  skip_before_action :authorize_request, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy , :update, :assign_sub_screen, :unassign_sub_screen , :more_screens]
+  skip_before_action :authenticate_user!, only: [:index, :show , :create, :assign_screen, :unassign_screen , :destroy , :update, :assign_sub_screen, :unassign_sub_screen , :more_screens]
 
   def index
     containers = ScreenContainer.includes(:screens).all
@@ -122,6 +122,11 @@ class Api::V1::ScreenContainersController < ApplicationController
   def assign_screen
     container = ScreenContainer.find(params[:id])
     screen = Screen.find(params[:screen_id])
+    UserLog.create(
+      user: current_user, 
+      event_type: "SCREEN_ASSIGNED_TO_CONTAINER", 
+      details: "A user assigned the screen named '#{screen.name}' to the container '#{container.name}'."
+    )
     container.screens << screen unless container.screens.include?(screen)
     render json: { message: "Screen assigned successfully" }
   end
@@ -142,6 +147,11 @@ class Api::V1::ScreenContainersController < ApplicationController
     end
 
     screen = Screen.find(params[:screen_id])
+    UserLog.create(
+      user: current_user, 
+      event_type: "SCREEN_UNASSIGNED_TO_CONTAINER", 
+      details: "A user unassigned the screen named '#{screen.name}' from the container '#{container.name}'."
+    )
     container.screens.delete(screen)
     render json: { message: "Screen unassigned successfully" }
   end
