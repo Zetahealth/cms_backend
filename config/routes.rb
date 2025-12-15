@@ -64,6 +64,14 @@ Rails.application.routes.draw do
 
       get "/logs", to: "user_logs#index"
 
+      resources :logs, controller: "user_logs"  do
+        collection do
+          get :users
+        end
+        member do
+          patch :update_users_permission
+        end
+      end
 
 
     end

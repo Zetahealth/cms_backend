@@ -11,6 +11,7 @@ class User < ApplicationRecord
 
 
   enum :role, { user: "2", admin: "1" }
+  enum :permission, { editor: "2", viewer: "1" }
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true
 
