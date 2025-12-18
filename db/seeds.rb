@@ -15,20 +15,41 @@
 #     user.permission = '2'
 # end
 
-user = User.find_by(email: "admin@yopmail.com")
+# user = User.find_by(email: "admin@yopmail.com")
+
+# if user
+#   user.password = "Cmf@1234"
+#   user.password_confirmation = "Cmf@1234"
+#   user.save!(validate: false)  # ← IMPORTANT
+# else
+#   User.create!(
+#     email: "admin@yopmail.com",
+#     password: "Cmf@1234",
+#     password_confirmation: "Cmf@1234",
+#     role: "1",
+#     name: "Admin",
+#     permission: "2"
+#   )
+# end
+
+user = User.find_by(email: "thiru12@yopmail.com")
 
 if user
-  user.password = "Cmf@1234"
-  user.password_confirmation = "Cmf@1234"
-  user.save!(validate: false)  # ← IMPORTANT
-else
-  User.create!(
-    email: "admin@yopmail.com",
-    password: "Cmf@1234",
-    password_confirmation: "Cmf@1234",
-    role: "1",
-    name: "Admin",
-    permission: "2"
+  user.update!(
+    email: "asf@gmail.com"
   )
+  puts "✅ Email updated to asf@gmail.com"
+else
+  puts "❌ User not found with email thiru12@yopmail.com"
 end
 
+# user = User.find_by(email: "thiru23@gmail.com")
+
+# if user
+#   user.update!(
+#     email: "asf@gmail.com"
+#   )
+#   puts "✅ Email updated to asf@gmail.com"
+# else
+#   puts "❌ User not found with email thiru12@yopmail.com"
+# end
