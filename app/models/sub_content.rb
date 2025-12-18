@@ -5,4 +5,15 @@ class SubContent < ApplicationRecord
     has_one_attached :qr_code
     has_one_attached :sub_image
     has_one_attached :sub_image2
+
+    has_many_attached :asf_group_images
+    has_many_attached :asf_item_images
+    before_validation :set_default_asf_data
+
+  private
+
+  def set_default_asf_data
+    self.asf_data ||= {}
+  end
+
 end

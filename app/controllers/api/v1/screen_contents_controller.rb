@@ -213,6 +213,36 @@ class Api::V1::ScreenContentsController < ApplicationController
       sub_contents_records = SubContent.where(content_id: c.id)
 
       sub_contents = sub_contents_records.map do |sub|
+
+        group_images = sub.asf_group_images.map do |img|
+          Rails.application.routes.url_helpers.rails_blob_url(img, host: "https://backendafp.connectorcore.com")
+        end
+
+        item_images = sub.asf_item_images.map do |img|
+          Rails.application.routes.url_helpers.rails_blob_url(img, host: "https://backendafp.connectorcore.com")
+        end
+
+        # ASF blocks reconstruction
+        asf_blocks = []
+        item_img_index = 0
+
+        (sub.asf_data || []).each_with_index do |group, g_index|
+          items = group["items"].map do |item|
+            {
+              text: item["text"],
+              image: item_images[item_img_index].tap { item_img_index += 1 }
+            }
+          end
+
+          asf_blocks << {
+            title: group["title"],
+            image: group_images[g_index],
+            items: items
+          }
+        end
+
+
+
         {
           id: sub.id,
           description: sub.description,
@@ -231,7 +261,11 @@ class Api::V1::ScreenContentsController < ApplicationController
 
           gallery_images: sub.gallery_images.map { |img|
             Rails.application.routes.url_helpers.rails_blob_url(img, host: "https://backendafp.connectorcore.com")
-          }
+          },
+
+          # ✅ ASF response
+          asf_blocks: asf_blocks,
+          has_asf: asf_blocks.any?
         }
       end
 
