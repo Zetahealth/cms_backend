@@ -67,9 +67,11 @@ Rails.application.routes.draw do
       resources :logs, controller: "user_logs"  do
         collection do
           get :users
+          post :create_user
         end
         member do
           patch :update_users_permission
+          delete :delete_user
         end
       end
 

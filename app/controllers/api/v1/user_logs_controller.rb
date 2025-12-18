@@ -45,7 +45,7 @@ class Api::V1::UserLogsController < ApplicationController
 
   def users
     users = User.all
-    render json: users.select(:id, :name, :email, :permission)
+    render json: users.select(:id, :name, :email, :permission ,:created_at)
   end
 
   def update_users_permission
@@ -56,6 +56,18 @@ class Api::V1::UserLogsController < ApplicationController
     render json: { error: "Failed to update user permission." }, status: :unprocessable_entity
     end
   end
+
+  def delete_user
+    user = User.find(params[:id])
+    user.destroy
+    render json: { message: "User deleted successfully." }, status: :ok
+  end
+
+  def create_user
+    
+
+  end
+
 
 
 end
