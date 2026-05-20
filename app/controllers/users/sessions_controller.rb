@@ -3,37 +3,52 @@
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
   skip_before_action :authenticate_user!, only: [:create]
-  # GET /resource/sign_in
-  # def new
-  #   super
-  # end
-
-  # POST /resource/sign_in
-  # def create
-  #   super
-  # end
-
-  # DELETE /resource/sign_out
-  # def destroy
-  #   super
-  # end
-
-  # protected
-
-  # If you have extra params to permit, append them to the sanitizer.
-  # def configure_sign_in_params
-  #   devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
-  # end
+  
   respond_to :json
 
-  private
+  def create
+    user = User.find_by(email: params[:user][:email])
 
-  def respond_with(resource, _opts = {})
-    token = request.env['warden-jwt_auth.token'] # <- this is how JWT is retrieved
-    render json: {
-      status: { code: 200, message: 'Logged in successfully.' },
-      user: resource,
-      token: token
-    }, status: :ok
+    if user && user.valid_password?(params[:user][:password])
+
+      # Reset failed attempts after successful login
+      user.update(failed_attempts: 0)
+
+      token = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil).first
+
+      render json: {
+        status: {
+          code: 200,
+          message: 'Logged in successfully.'
+        },
+        user: user,
+        token: token
+      }, status: :ok
+
+    else
+
+      if user
+        user.failed_attempts ||= 0
+        user.failed_attempts += 1
+        user.save
+
+        if user.failed_attempts >= 5
+
+          # send reset password mail
+          user.send_reset_password_instructions
+
+          # reset counter after sending mail
+          user.update(failed_attempts: 0)
+
+          return render json: {
+            error: "Too many wrong attempts. Reset password link sent to your email."
+          }, status: :unprocessable_entity
+        end
+      end
+
+      render json: {
+        error: "Invalid email or password"
+      }, status: :unauthorized
+    end
   end
 end

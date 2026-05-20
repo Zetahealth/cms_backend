@@ -86,16 +86,33 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
-    routes.default_url_options = { host: "https://backendafp.connectorcore.com" }
 
   # You can also add this for URL helpers and mailers
   # config.action_mailer.default_url_options = { host: "https://backendafp.connectorcore.com" }
 
-  config.hosts << "backendafp.connectorcore.com"
 
   # Make sure Active Storage uses correct URL host for files
   config.active_storage.resolve_model_to_route = :rails_storage_proxy
+ 
   config.active_storage.default_url_options = {
-    host: "https://backendafp.connectorcore.com"
+    host: "backendafp.connectorcore.com"
+  }
+  config.action_mailer.default_url_options = {
+    host: 'afp.connectorcore.com',
+    protocol: 'https'
+  }
+
+  config.action_mailer.delivery_method = :smtp
+
+  config.action_mailer.smtp_settings = {
+    address: "smtp.gmail.com",
+    port: 587,
+    domain: "gmail.com",
+    user_name: "zcorp774@gmail.com",
+    password: "ptavyhdkxvcrrrql",
+    authentication: :plain,
+    enable_starttls_auto: true,
+    open_timeout: 5,
+    read_timeout: 5
   }
 end
