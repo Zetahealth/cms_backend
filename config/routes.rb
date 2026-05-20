@@ -5,8 +5,7 @@ Rails.application.routes.draw do
     controllers: {
       registrations: 'users/registrations',
       sessions: 'users/sessions',
-
-      
+      passwords: 'users/passwords'      
     }
   # devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -78,6 +77,9 @@ Rails.application.routes.draw do
 
     end
   end
-
-
+  namespace :api do
+    namespace :v1 do
+      post "create_user", to: "user_logs#create_user"
+    end
+  end
 end

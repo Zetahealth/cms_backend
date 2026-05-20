@@ -32,6 +32,7 @@
 # end
 class Api::V1::UserLogsController < ApplicationController
   before_action :authenticate_user!
+  skip_before_action :authenticate_user!, only: [:create_user]
 
   def index
     logs = UserLog
@@ -63,11 +64,36 @@ class Api::V1::UserLogsController < ApplicationController
     render json: { message: "User deleted successfully." }, status: :ok
   end
 
+   # POST /api/v1/create_user
   def create_user
-    
+    unless current_user && current_user.admin?
+      return render json: { error: "Only admin can create users." }, status: :unauthorized
+    end
 
+    user = User.new(user_params)
+
+    if user.save
+      render json: {
+        message: "User created successfully.",
+        user: user
+      }, status: :created
+    else
+      render json: {
+        errors: user.errors.full_messages
+      }, status: :unprocessable_entity
+    end
   end
 
+  private
 
-
+  def user_params
+    params.permit(
+      :name,
+      :email,
+      :password,
+      :password_confirmation,
+      :role,
+      :permission
+    )
+  end
 end
