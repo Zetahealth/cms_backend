@@ -93,6 +93,8 @@ Rails.application.configure do
 
   # Make sure Active Storage uses correct URL host for files
   config.active_storage.resolve_model_to_route = :rails_storage_proxy
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
  
   config.active_storage.default_url_options = {
     host: "backendafp.connectorcore.com"
