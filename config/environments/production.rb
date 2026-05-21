@@ -96,8 +96,9 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
  
+
   config.active_storage.default_url_options = {
-    host: "backendafp.connectorcore.com"
+    host: "https://backendafp.connectorcore.com"
   }
   config.action_mailer.default_url_options = {
     host: 'afp.connectorcore.com',
