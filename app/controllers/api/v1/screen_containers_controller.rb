@@ -115,22 +115,23 @@ class Api::V1::ScreenContainersController < ApplicationController
     end
   end
 
-
-
-
-
   def assign_screen
-    container = ScreenContainer.find(params[:id])
-    screen = Screen.find(params[:screen_id])
+    container = ScreenContainer.find_by(id: params[:id])
+    return render json: { error: "Container not found" }, status: :not_found unless container
+
+    screen = Screen.find_by(id: params[:screen_id])
+    return render json: { error: "Screen not found" }, status: :not_found unless screen
+
     UserLog.create(
-      user: current_user, 
-      event_type: "SCREEN_ASSIGNED_TO_CONTAINER", 
+      user: current_user,
+      event_type: "SCREEN_ASSIGNED_TO_CONTAINER",
       details: "A user assigned the screen named '#{screen.name}' to the container '#{container.name}'."
     )
+
     container.screens << screen unless container.screens.include?(screen)
+
     render json: { message: "Screen assigned successfully" }
   end
-
 
   def assign_sub_screen
     container = ScreenContainer.find(params[:id])
@@ -141,18 +142,22 @@ class Api::V1::ScreenContainersController < ApplicationController
 
 
   def unassign_screen
-    container = ScreenContainer.find(params[:id])
-    if params[:screen_id].present?
-      ScreenBroadcaster.container_refresh(container)
-    end
+    container = ScreenContainer.find_by(id: params[:id])
+    return render json: { error: "Container not found" }, status: :not_found unless container
 
-    screen = Screen.find(params[:screen_id])
+    screen = Screen.find_by(id: params[:screen_id])
+    return render json: { error: "Screen not found" }, status: :not_found unless screen
+
+    ScreenBroadcaster.container_refresh(container)
+
     UserLog.create(
-      user: current_user, 
-      event_type: "SCREEN_UNASSIGNED_TO_CONTAINER", 
+      user: current_user,
+      event_type: "SCREEN_UNASSIGNED_TO_CONTAINER",
       details: "A user unassigned the screen named '#{screen.name}' from the container '#{container.name}'."
     )
+
     container.screens.delete(screen)
+
     render json: { message: "Screen unassigned successfully" }
   end
 
@@ -193,14 +198,18 @@ class Api::V1::ScreenContainersController < ApplicationController
 
     # UPDATE CONTAINER
   def update
-    c = ScreenContainer.find(params[:id])
+    c = ScreenContainer.find_by(id: params[:id])
+
+      return render json: { error: "Container not found" }, status: :not_found unless c
 
     # Update simple fields
-    c.update(
+    unless c.update(
       name: params[:name],
       content_type: params[:content_type],
       transition_effect: params[:transition_effect]
     )
+      return render json: { errors: c.errors.full_messages }, status: :unprocessable_entity
+    end
 
     # -------------------------
     # REPLACE CARD IMAGE (ONE FILE ONLY)
@@ -214,12 +223,12 @@ class Api::V1::ScreenContainersController < ApplicationController
     # REPLACE BACKGROUND
     # -------------------------
     if params[:background].present?
-      c.background.purge
+      c.background.purge if c.background.attached?
       c.background.attach(params[:background])
     end
-
+        
     if params[:subbackground].present?
-      c.subbackground.purge
+      c.subbackground.purge if c.subbackground.attached?
       c.subbackground.attach(params[:subbackground])
     end
     
@@ -235,8 +244,6 @@ class Api::V1::ScreenContainersController < ApplicationController
       screens: c.screens.map { |s| { id: s.id, name: s.name } }
     }
   end
-
-
 
 
   def more_screens
