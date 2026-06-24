@@ -158,14 +158,29 @@ class Api::V1::ScreenContainersController < ApplicationController
 
 
   def unassign_sub_screen
-    container = ScreenContainer.find(params[:id])
-    if params[:screen_id].present?
-      ScreenBroadcaster.container_refresh(container)
+    container = ScreenContainer.find_by(id: params[:id])
+
+    return render json: {
+      error: "Screen container not found"
+    }, status: :not_found unless container
+
+    screen = Screen.find_by(id: params[:screen_id])
+
+    return render json: {
+      error: "Screen not found"
+    }, status: :not_found unless screen
+
+    begin
+      ScreenBroadcaster.container_refresh(container) if params[:screen_id].present?
+    rescue => e
+      Rails.logger.error("ScreenBroadcaster Error: #{e.message}")
     end
 
-    screen = Screen.find(params[:screen_id])
     container.subscreens.delete(screen)
-    render json: { message: "Screen unassigned successfully" }
+
+    render json: {
+      message: "Screen unassigned successfully"
+    }, status: :ok
   end
 
 
