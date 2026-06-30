@@ -215,8 +215,11 @@ class Api::V1::ScreenContainersController < ApplicationController
     # REPLACE CARD IMAGE (ONE FILE ONLY)
     # -------------------------
     if params[:files].present?
-      c.files.purge                   # remove all existing
-      c.files.attach(params[:files])   # attach ONLY ONE file
+      c.files.purge
+
+      Array(params[:files]).each do |file|
+        c.files.attach(file)
+      end
     end
 
     # -------------------------
